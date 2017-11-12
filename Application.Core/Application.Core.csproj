@@ -1,0 +1,81 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{3DEBB08A-6C91-4F02-9E49-A9E5CE2D8488}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Application.Core</RootNamespace>
+    <AssemblyName>Application.Core</AssemblyName>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Transactions" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="CommandHandlers\AddNewProductCommandHandler.cs" />
+    <Compile Include="CommandHandlers\AddNewProductOptionCommandHandler.cs" />
+    <Compile Include="CommandHandlers\Decorators\TransactionScopeDecorator.cs" />
+    <Compile Include="CommandHandlers\DeleteProductCommandHandler.cs" />
+    <Compile Include="CommandHandlers\DeleteProductOptionCommandHandler.cs" />
+    <Compile Include="CommandHandlers\UpdateProductOptionCommandHandler.cs" />
+    <Compile Include="CommandHandlers\UpdateProductsCommandHandler.cs" />
+    <Compile Include="Commands\AddNewProductCommand.cs" />
+    <Compile Include="Commands\AddNewProductOptionCommand.cs" />
+    <Compile Include="Commands\DeleteProductCommand.cs" />
+    <Compile Include="Commands\DeleteProductOptionCommand.cs" />
+    <Compile Include="Commands\UpdateProductOptionCommand.cs" />
+    <Compile Include="Commands\UpdateProductsCommand.cs" />
+    <Compile Include="Dtos\ProductDto.cs" />
+    <Compile Include="Dtos\ProductOptionDto.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Queries\GetAllProductsQuery.cs" />
+    <Compile Include="Queries\GetProductByIdQuery.cs" />
+    <Compile Include="Queries\GetProductByNameQuery.cs" />
+    <Compile Include="Queries\GetProductOptionQuery.cs" />
+    <Compile Include="Queries\GetProductOptionsForProductQuery.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Application.Common\Application.Common.csproj">
+      <Project>{B0CEC70C-64D3-4FE0-8862-61238B88F679}</Project>
+      <Name>Application.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Domain.Common\Domain.Common.csproj">
+      <Project>{2E7E236F-526B-4748-91BB-9519BD09C794}</Project>
+      <Name>Domain.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Domain.Core\Domain.Core.csproj">
+      <Project>{7F31F1CF-30B8-44EF-8D64-E047C71DC1C7}</Project>
+      <Name>Domain.Core</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

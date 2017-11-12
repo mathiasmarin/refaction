@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+﻿using Infrastructure.Autowiring;
 using System.Web.Http;
-using System.Web.Routing;
+using SimpleInjector.Integration.WebApi;
 
 namespace refactor_me
 {
@@ -12,6 +9,8 @@ namespace refactor_me
         protected void Application_Start()
         {
             GlobalConfiguration.Configure(WebApiConfig.Register);
+            var container = Boostrapper.ConfigureServices();
+            GlobalConfiguration.Configuration.DependencyResolver = new SimpleInjectorWebApiDependencyResolver(container);
         }
     }
 }

@@ -1,115 +1,98 @@
 ﻿using System;
-using System.Net;
+using System.Collections.Generic;
 using System.Web.Http;
-using refactor_me.Models;
+using Application.Common;
+using Application.Core.Commands;
+using Application.Core.Dtos;
+using Application.Core.Queries;
 
 namespace refactor_me.Controllers
 {
-    [RoutePrefix("products")]
+    [RoutePrefix("api/products")]
     public class ProductsController : ApiController
     {
-        [Route]
-        [HttpGet]
-        public Products GetAll()
+        private readonly ICommandHandler<DeleteProductCommand> _deleteProductCommandHandler;
+        private readonly IQueryHandler<GetProductOptionsForProductQuery, ICollection<ProductOptionDto>> _getproductOptionsQueryHandler;
+        private readonly ICommandHandler<UpdateProductsCommand> _updateProductsCommandHandler;
+        private readonly ICommandHandler<AddNewProductCommand> _addNewProductCommandHandler;
+        private readonly IQueryHandler<GetProductByIdQuery, ProductDto> _getProductByIdQueryHandler;
+        private readonly IQueryHandler<GetProductByNameQuery, ProductDto> _getProductByNameQueryHandler;
+        private readonly IQueryHandler<GetAllProductsQuery, ICollection<ProductDto>> _getAllProductsQueryHandler;
+
+        public ProductsController(IQueryHandler<GetAllProductsQuery, ICollection<ProductDto>> getAllProductsQueryHandler,
+            IQueryHandler<GetProductByNameQuery, ProductDto> getProductByNameQueryHandler, IQueryHandler<GetProductByIdQuery, ProductDto> getProductByIdQueryHandler,
+            ICommandHandler<AddNewProductCommand> addNewProductCommandHandler, ICommandHandler<UpdateProductsCommand> updateProductsCommandHandler,
+            ICommandHandler<DeleteProductCommand> deleteProductCommandHandler, IQueryHandler<GetProductOptionsForProductQuery, ICollection<ProductOptionDto>> getproductOptionsQueryHandler)
         {
-            return new Products();
+            if (getAllProductsQueryHandler == null) throw new ArgumentNullException(nameof(getAllProductsQueryHandler));
+            if (getProductByNameQueryHandler == null)
+                throw new ArgumentNullException(nameof(getProductByNameQueryHandler));
+            if (getProductByIdQueryHandler == null) throw new ArgumentNullException(nameof(getProductByIdQueryHandler));
+            if (addNewProductCommandHandler == null)
+                throw new ArgumentNullException(nameof(addNewProductCommandHandler));
+            if (updateProductsCommandHandler == null)
+                throw new ArgumentNullException(nameof(updateProductsCommandHandler));
+            if (deleteProductCommandHandler == null)
+                throw new ArgumentNullException(nameof(deleteProductCommandHandler));
+            if (getproductOptionsQueryHandler == null)
+                throw new ArgumentNullException(nameof(getproductOptionsQueryHandler));
+           _deleteProductCommandHandler = deleteProductCommandHandler;
+            _getproductOptionsQueryHandler = getproductOptionsQueryHandler;
+            _updateProductsCommandHandler = updateProductsCommandHandler;
+            _addNewProductCommandHandler = addNewProductCommandHandler;
+            _getProductByIdQueryHandler = getProductByIdQueryHandler;
+            _getProductByNameQueryHandler = getProductByNameQueryHandler;
+            _getAllProductsQueryHandler = getAllProductsQueryHandler;
         }
 
         [Route]
         [HttpGet]
-        public Products SearchByName(string name)
+        public ICollection<ProductDto> GetAll()
         {
-            return new Products(name);
+            return _getAllProductsQueryHandler.HandleQuery(new GetAllProductsQuery());
+        }
+
+        [Route("Name/{Name}")]
+        [HttpGet]
+        public ProductDto SearchByName([FromUri]GetProductByNameQuery query)
+        {
+            return _getProductByNameQueryHandler.HandleQuery(query);
         }
 
         [Route("{id}")]
         [HttpGet]
-        public Product GetProduct(Guid id)
+        public ProductDto GetProduct([FromUri]GetProductByIdQuery query)
         {
-            var product = new Product(id);
-            if (product.IsNew)
-                throw new HttpResponseException(HttpStatusCode.NotFound);
-
-            return product;
+            return _getProductByIdQueryHandler.HandleQuery(query);
         }
 
-        [Route]
+        [Route("Create")]
         [HttpPost]
-        public void Create(Product product)
+        public void Create([FromBody]AddNewProductCommand command)
         {
-            product.Save();
+            _addNewProductCommandHandler.Execute(command);
         }
 
         [Route("{id}")]
         [HttpPut]
-        public void Update(Guid id, Product product)
+        public void Update([FromBody]UpdateProductsCommand command)
         {
-            var orig = new Product(id)
-            {
-                Name = product.Name,
-                Description = product.Description,
-                Price = product.Price,
-                DeliveryPrice = product.DeliveryPrice
-            };
-
-            if (!orig.IsNew)
-                orig.Save();
+            _updateProductsCommandHandler.Execute(command);
         }
 
         [Route("{id}")]
         [HttpDelete]
-        public void Delete(Guid id)
+        public void Delete([FromUri]DeleteProductCommand command)
         {
-            var product = new Product(id);
-            product.Delete();
+            _deleteProductCommandHandler.Execute(command);
         }
 
-        [Route("{productId}/options")]
+        [Route("{ProductId}/options")]
         [HttpGet]
-        public ProductOptions GetOptions(Guid productId)
+        public ICollection<ProductOptionDto> GetOptions([FromUri]GetProductOptionsForProductQuery forProductQuery)
         {
-            return new ProductOptions(productId);
+            return _getproductOptionsQueryHandler.HandleQuery(forProductQuery);
         }
-
-        [Route("{productId}/options/{id}")]
-        [HttpGet]
-        public ProductOption GetOption(Guid productId, Guid id)
-        {
-            var option = new ProductOption(id);
-            if (option.IsNew)
-                throw new HttpResponseException(HttpStatusCode.NotFound);
-
-            return option;
-        }
-
-        [Route("{productId}/options")]
-        [HttpPost]
-        public void CreateOption(Guid productId, ProductOption option)
-        {
-            option.ProductId = productId;
-            option.Save();
-        }
-
-        [Route("{productId}/options/{id}")]
-        [HttpPut]
-        public void UpdateOption(Guid id, ProductOption option)
-        {
-            var orig = new ProductOption(id)
-            {
-                Name = option.Name,
-                Description = option.Description
-            };
-
-            if (!orig.IsNew)
-                orig.Save();
-        }
-
-        [Route("{productId}/options/{id}")]
-        [HttpDelete]
-        public void DeleteOption(Guid id)
-        {
-            var opt = new ProductOption(id);
-            opt.Delete();
-        }
+       
     }
 }
